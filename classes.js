@@ -202,10 +202,10 @@ class ListClients{
     }
 
     listClientsIds(){
-       return this.arrClients.map(client => {
-           client.id
-           client.name
-        });
+       return this.arrClients.map(client => client.id);
+    }
+    listClientsIdsSortByTaxNumber(){
+        return this.arrClients.sort((clientA, clientB) => clientB.taxNumber-clientA.taxNumber).map(client => client.id);
     }
 }
 
@@ -218,9 +218,10 @@ class Account{
 }
 
 class ListAccounts{
-    constructor(arrClients, arrAccounts){
+    constructor(arrClients, arrAccounts, arrBanks){
         this.arrClients = arrClients;
         this.arrAccounts = arrAccounts;
+        this.arrBanks = arrBanks;
     }
 
     getListAccountByClient(){
@@ -267,7 +268,26 @@ class ListAccounts{
         return result.sort((itemA,ItemB) => ItemB.balance-itemA.balance).map((item)=>item.balance);
     
     }
+    banksClientsTaxNumbers(){ 
+
+        const listResult = this.arrAccounts.reduce((acumulador,currentValue)=>{
+            
+           const { name } = this.arrBanks.find(({id})=> id==currentValue.bankId)
+           if(!acumulador[name]){
+               acumulador[name]={
+                   clients:[]
+               }
+           }
+           const { taxNumber } = this.arrClients.find(({id}) => id==currentValue.clientId)
+           if(acumulador[name].clients.indexOf(taxNumber)!==0) {
+            acumulador[name].clients.push(taxNumber)
+           }
+           return acumulador;
+        },{})
+        return listResult;
+    }
 }
+
 
 /**
  * 
@@ -284,31 +304,25 @@ const createBanks = () => banks.map(bank => new Bank(bank.id, bank.name));
 const createAccounts = () => accounts.map(account => new Account(account.clientId,account.bankId, account.balance));
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//console.log(createAccounts());
-// const createClients = () => {
-//     let clientList = clients.map(client => new Client(client.id,client.taxNumber,client.name));
-//     return clientList;
-// }
-
-// createClients().map(client => {console.log(client.taxNumber)
-// console.log(client.id)});
-
-//console.log(createClients());
-
 //creacion de clases
 
-const accountList = new ListAccounts(clients,accounts);
+const accountList = new ListAccounts(clients,accounts,banks);
+const clientList = new ListClients(clients);
+
 
 
 //accountList.sortClientsBankBalance();
 
+//creacion de constantes que recibiran lo retornado por los metodos de las clases para responder las preguntas del ejercicio
+
 const richClientsBalances = () => accountList.richClientsBalances();
 const sortClientsTotalBalances = () => accountList.sortClientsBankBalance();
+const banksClientsTaxNumbers = () => accountList.banksClientsTaxNumbers();
 //console.log(accountList.getListRichersSantander()[0])
 
-const listClientsIds = () => clients.map(client => client.id);
+const listClientsIds = () => clientList.listClientsIds();
 
-const listClientsIdsSortByTaxNumber = () => clients.sort((clientA, clientB) => clientB.taxNumber-clientA.taxNumber).map(client => client.id);
+const listClientsIdsSortByTaxNumber = () => clientList.listClientsIdsSortByTaxNumber();
 
 const listAccountByClient = () => clients.map(client => {
     let accountsByClient=accounts.filter(account => account.clientId==client.id);
@@ -321,14 +335,14 @@ const cuentasFiltradas = accounts.filter((account) => account.clientId == 6);
 
 
 // Impresión de soluciones. No modificar.
-// console.log('Pregunta 0');
-// console.log(listClientsIds());
+ //console.log('Pregunta 0');
+ //console.log(listClientsIds());
  //console.log('Pregunta 1');
  //console.log(listClientsIdsSortByTaxNumber());
 //console.log('Pregunta 2');
 //console.log(sortClientsTotalBalances());
 // console.log('Pregunta 3');
-// console.log(banksClientsTaxNumbers());
+ console.log(banksClientsTaxNumbers());
 // console.log('Pregunta 4');
 // console.log(richClientsBalances());
 // console.log('Pregunta 5');
