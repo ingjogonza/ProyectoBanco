@@ -265,7 +265,7 @@ class ListAccounts{
             return acumulador
         },{})
         
-        return result.sort((itemA,ItemB) => ItemB.balance-itemA.balance).map((item)=>item.balance);
+        return result.sort((itemA,itemB) => itemB.balance-itemA.balance).map((item)=>item.balance);
     
     }
     banksClientsTaxNumbers(){ 
@@ -286,6 +286,24 @@ class ListAccounts{
         },{})
         return listResult;
     }
+
+    banksRankingByTotalBalance(){
+        let result = [];
+        this.arrAccounts.reduce((acumulador,currentValue) =>{
+            const { bankId, balance } = currentValue;
+            if(!acumulador[bankId]){
+                acumulador[bankId]={
+                    bankId: bankId,
+                    balance: 0
+                }
+                result.push(acumulador[bankId]);
+            }
+            acumulador[bankId].balance += balance;
+            return acumulador;
+        },{})
+        return result.sort((itemA,itemB) => itemA.balance-itemB.balance).map((item)=>item.bankId);
+    }
+
 }
 
 
@@ -308,6 +326,7 @@ const createAccounts = () => accounts.map(account => new Account(account.clientI
 
 const accountList = new ListAccounts(clients,accounts,banks);
 const clientList = new ListClients(clients);
+accountList.banksRankingByTotalBalance()
 
 
 
@@ -318,6 +337,7 @@ const clientList = new ListClients(clients);
 const richClientsBalances = () => accountList.richClientsBalances();
 const sortClientsTotalBalances = () => accountList.sortClientsBankBalance();
 const banksClientsTaxNumbers = () => accountList.banksClientsTaxNumbers();
+const banksRankingByTotalBalance = () => accountList.banksRankingByTotalBalance()
 //console.log(accountList.getListRichersSantander()[0])
 
 const listClientsIds = () => clientList.listClientsIds();
@@ -342,7 +362,7 @@ const cuentasFiltradas = accounts.filter((account) => account.clientId == 6);
 //console.log('Pregunta 2');
 //console.log(sortClientsTotalBalances());
 // console.log('Pregunta 3');
- console.log(banksClientsTaxNumbers());
+ //console.log(banksClientsTaxNumbers());
 // console.log('Pregunta 4');
 // console.log(richClientsBalances());
 // console.log('Pregunta 5');
